@@ -6,7 +6,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ${WORKSPACE}:/workspace:cached
+      - ../workspace:/workspace:cached
       - ./scripts/:/scripts:ro,cached
     # Overrides default command so things don't shut down after the process ends.
     #entrypoint: /usr/local/share/docker-init.sh
@@ -14,4 +14,4 @@ services:
     
 networks:
   default:
-    name: $NETWORK
+    name: devcontainer-dotnet

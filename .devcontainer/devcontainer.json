@@ -3,6 +3,12 @@
   "dockerComposeFile": ["docker-compose.yaml"],
   "service": "devcontainer",
   "remoteUser": "vscode",
+  "remoteEnv": {
+    "NETWORK":"devcontainer-dotnet",
+  },
+  "mounts": [
+   "source=${localWorkspaceFolder}/workspace,target=/workspace,type=bind,consistency=cached"
+  ],
   "workspaceFolder": "/workspace",
   "customizations": {
         "vscode": {
