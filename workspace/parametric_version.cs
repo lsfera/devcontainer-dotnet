@@ -1,49 +1,60 @@
-#!/usr/bin/dotnet run
+#!/usr/bin/env dotnet
 #:property TargetFramework=net10.0
 #:property LangVersion=preview
 #:property Nullable=enable
 #:property ImplicitUsings=enable
 
+using System.IO.Pipelines;
 using System.Numerics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 ///: A parametric column layout version
-static int FindAdjacents(int[][] input)
+static int FindAdjacents(int[] input, int columns)
 {
-    var layout = input.First();
-    var columns = layout.ElementAt(1)!;
-    var availableSpotsCount = layout.ElementAt(0);
+    var availableSpotsCount = input[0];
     var allSpots = new int[availableSpotsCount].Select((_, i) => i + 1); ;
-    var occupiedSpots = input.ElementAt(1);
+    var occupiedSpots = input[1..];
     var availableSpots = allSpots.Except(occupiedSpots);
 
-    var accumulator = allSpots.FindAdjacentHorizontally(occupiedSpots, columns);
-    Console.WriteLine($"horizontal:{accumulator.Aggregate("", (a, b) => $"{a}[{string.Join(",", b)}],").TrimEnd(',')}");
-    var verticalMatches = from col in Enumerable.Range(1, columns).Select(i => i - 1)
-                let matches = availableSpots
+    var horizontalMatches = allSpots.FindAdjacentHorizontally(occupiedSpots, columns);  
+    Console.WriteLine($"horizontal:{horizontalMatches.Aggregate("", (a, b) => $"{a}[{string.Join(",", b)}],").TrimEnd(',')}");
+    var verticalMatches = Enumerable.Range(1, columns).Select(i => i - 1)
+                .SelectMany(col =>
+                    availableSpots
                     .FindAdjacentVertically(
                         _ => _ % columns == col,
                         arr => arr.ElementAtOrDefault(1) - arr.First() == columns)
-                select (col, matches);
-                                    
-    foreach (var (col, matches) in verticalMatches)
-      {
-        Console.WriteLine($"mod{col}:{matches.Aggregate("", (a, b) => $"{a}[{string.Join(",", b)}],").TrimEnd(',')}");
-    }
+                    .Select(matches =>
+                    {
+                        Console.WriteLine($"mod{col}:{matches.Aggregate("", (a, b) => $"{a}[{string.Join(",", b)}],").TrimEnd(',')}");
+                        return (col, matches);
+                    }));
 
-    return accumulator.Union(verticalMatches.SelectMany(f => f.matches)).Count();
+
+    return verticalMatches.Select(f => f.matches)
+            .Union(horizontalMatches).Count() ;
 }
-
-foreach (var columns in new[] { 2, 3, 4 })
+var pipe = new Pipe();
+await pipe.Writer.WriteAsync(System.Text.Encoding.UTF8.GetBytes((await Console.In.ReadLineAsync())!));
+await pipe.Writer.CompleteAsync();
+var inputs = await JsonSerializer.DeserializeAsync(pipe.Reader, JsonContext.Default.Int32ArrayArray) ?? throw new InvalidOperationException("Deserialization failed");
+foreach (var column in inputs[1])
 {
-    Console.WriteLine($"Columns: {columns}");
-    Console.WriteLine(FindAdjacents([[12, columns], [2, 5, 8, 12]]));
+    Console.WriteLine($"Columns: {column}");
+    Console.WriteLine(FindAdjacents(inputs[0],column));
 }
+
+
+
+[JsonSerializable(typeof(int[][]))]
+public partial class JsonContext : JsonSerializerContext { }
 
 public static class Extensions
 {
-    extension<T>(IEnumerable<T> source)where T : INumber<T>
+    extension<T>(IEnumerable<T> source) where T : INumber<T>
     {
-        public IEnumerable<T[]> FindAdjacentVertically(
+        public IEnumerable<IEnumerable<T>> FindAdjacentVertically(
             Func<T, bool> predicate,
             Func<T[], bool> areAdjacent)
                 => source.Where(predicate)
@@ -52,9 +63,9 @@ public static class Extensions
                     .Chunk(2)
                     .Where(areAdjacent);
 
-        public IEnumerable<T[]> FindAdjacentHorizontally(
+        public IEnumerable<IEnumerable<T>> FindAdjacentHorizontally(
             IEnumerable<T> occupiedSpots,
-            int columns)  
+            int columns)
                 => source
                 .Select((v, i) => Enumerable.Range(2, columns - 2)
                                             .Select(i => T.CreateChecked(i))
@@ -68,5 +79,5 @@ public static class Extensions
                     var second = amendedArray.ElementAtOrDefault(1);
                     return first != null && second != null && second - first == T.CreateChecked(1);
                 });
-    }   
+    }
 }

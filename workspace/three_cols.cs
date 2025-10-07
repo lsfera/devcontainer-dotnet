@@ -5,7 +5,7 @@ static int FindAdjacents(int[] input)
     var allSpots = new int[input.First()].Select((_, i) => i + 1); ;
     var occupiedSpots = input.Skip(1);
     var availableSpots = allSpots.Except(occupiedSpots);
-    
+
     var horizontal = allSpots
                         .Select((v, i) => v % 3 == 2 ? new[] { v, v } : [v])
                         .SelectMany(x => x)
@@ -28,11 +28,11 @@ static int FindAdjacents(int[] input)
         _ => _ % 3 == 2,
         arr => arr.ElementAtOrDefault(1) - arr.First() == 3);
     Console.WriteLine($"mod2:{mod2.Aggregate("", (a, b) => $"{a}[{string.Join(",", b)}],").TrimEnd(',')}");
-    
+
     return horizontal.Union(mod0).Union(mod1).Union(mod2).Count();
 }
 
-Console.WriteLine(FindAdjacents([12, 2, 5, 8, 12]));
+Console.WriteLine(FindAdjacents([.. Console.ReadLine()!.Split(',').Select(int.Parse)]));
 
 public static class EnumerableExtensions
 {

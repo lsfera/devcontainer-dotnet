@@ -30,6 +30,10 @@ Output:
 
 [Solution](./two_cols.cs)
 
+```
+echo ' 12, 2, 5, 8, 12' |  ./two_cols.cs
+```
+
 # Exercise 2
 
 Extend the previous solution to accomodate a three colum layout. 
@@ -49,6 +53,10 @@ Output:
 
 [Solution](./three_cols.cs)
 
+```
+echo ' 12, 2, 5, 8, 12' |  ./three_cols.cs
+```
+
 # Exercise 3
 
 Extend the previous solution to accomodate a four column layout.
@@ -67,19 +75,22 @@ Output:
 
 [Solution](./four_cols.cs)
 
+```
+echo ' 12, 2, 5, 8, 12' |  ./four_cols.cs
+```
+
 # Exercise 4
 
 Extend the previous solution to accomodate a parametric column layout.
 
 The input array provides layout column as well in the following form:
 
-- [[availableSpots, columns], [ occupiedSpots ]]; 
-
-Using the previous examples the input parameter will be respectively:
-
-- [[12, 2],[2, 5, 8, 12]]
-- [[12, 3],[2, 5, 8, 12]]
-- [[12, 4],[2, 5, 8, 12]]
-
+- [[availableSpots, occupiedSpots],[column0, cloumn1]]; 
 
 [Solution](./parametric_version.cs)
+
+Using the previous examples the script will be:
+
+```
+echo '[[12, 2, 5, 8, 12],[2,3,4]]' |  ./parametric_version.cs
+```

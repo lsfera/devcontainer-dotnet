@@ -23,7 +23,7 @@ static int FindAdjacents(int[] input)
     return horizontal.Union(even).Union(odd).Count();
 }
 
-Console.WriteLine(FindAdjacents([12, 2, 5, 8, 12]));
+Console.WriteLine(FindAdjacents([.. Console.ReadLine()!.Split(',').Select(int.Parse)]));
 
 public static class EnumerableExtensions
 {
