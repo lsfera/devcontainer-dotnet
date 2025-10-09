@@ -1,12 +1,10 @@
 #!/usr/bin/dotnet run
 #:package Newtonsoft.Json@13.*
 
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 
-JContainer StripValues(string? json, params string[] values)
+JContainer StripValues(string json, params string[] values)
 {
-    Debug.Assert(json != null);
     Console.WriteLine($"Input JSON: {json}");
     JObject jsonObj = JObject.Parse(json);
     jsonObj.DescendantsAndSelf()
