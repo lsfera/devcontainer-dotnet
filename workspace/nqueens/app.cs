@@ -1,55 +1,55 @@
 #!/usr/bin/dotnet run
 
-    static void Solve(int n)
-    {
-        int[] board = new int[n];
-        List<int[]> solutions = [];
-        PlaceQueen(board, 0, n, solutions);
+static void Solve(int n)
+{
+    int[] board = new int[n];
+    List<int[]> solutions = [];
+    PlaceQueen(board, 0, n, solutions);
 
-        Console.WriteLine($"Total solutions for {n}-Queens: {solutions.Count}");
-        foreach (var sol in solutions)
+    Console.WriteLine($"Total solutions for {n}-Queens: {solutions.Count}");
+    foreach (var sol in solutions)
+    {
+        PrintBoard(sol, n);
+        Console.WriteLine();
+    }
+}
+
+static void PlaceQueen(int[] board, int row, int n, List<int[]> solutions)
+{
+    if (row == n)
+    {
+        solutions.Add([.. board]);
+        return;
+    }
+    for (int col = 0; col < n; col++)
+    {
+        if (IsSafe(board, row, col))
         {
-            PrintBoard(sol, n);
-            Console.WriteLine();
+            board[row] = col;
+            PlaceQueen(board, row + 1, n, solutions);
         }
     }
+}
 
-    static void PlaceQueen(int[] board, int row, int n, List<int[]> solutions)
+static bool IsSafe(int[] board, int row, int col)
+{
+    for (int i = 0; i < row; i++)
     {
-        if (row == n)
-        {
-            solutions.Add([..board]);
-            return;
-        }
-        for (int col = 0; col < n; col++)
-        {
-            if (IsSafe(board, row, col))
-            {
-                board[row] = col;
-                PlaceQueen(board, row + 1, n, solutions);
-            }
-        }
+        if (board[i] == col || Math.Abs(board[i] - col) == row - i)
+            return false;
     }
+    return true;
+}
 
-    static bool IsSafe(int[] board, int row, int col)
+static void PrintBoard(int[] board, int n)
+{
+    for (int i = 0; i < n; i++)
     {
-        for (int i = 0; i < row; i++)
+        for (int j = 0; j < n; j++)
         {
-            if (board[i] == col || Math.Abs(board[i] - col) == row - i)
-                return false;
+            Console.Write(board[i] == j ? "Q " : ". ");
         }
-        return true;
+        Console.WriteLine();
     }
-
-    static void PrintBoard(int[] board, int n)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                Console.Write(board[i] == j ? "Q " : ". ");
-            }
-            Console.WriteLine();
-        }
-    }
-    Solve(int.Parse(Console.In.ReadLine()!));
+}
+Solve(int.Parse(Console.In.ReadLine()!));
